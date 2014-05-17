@@ -15,11 +15,16 @@ activity[, 2] <- as.Date(activity[, 2], "%Y-%m-%d")
 ```r
 agg1 <- ddply(activity, .(date), summarize, total_steps = sum(steps), mean_steps = round(mean(steps), 
     2), median_steps = median(steps))
+par(bg = "white")
 hist(agg1$total_steps, breaks = 10, xlab = "Total number of steps taken each day", 
     main = "Histogram of total number of steps taken each day")
 ```
 
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
+
+
+Below shows the mean and median steps taken each day
+
 
 ```r
 agg1[, c("date", "mean_steps", "median_steps")]
@@ -99,9 +104,10 @@ agg2 <- ddply(activity, .(interval), summarize, avg_steps = round(mean(steps,
 plot(agg2$interval, agg2$avg_steps, type = "l", xlab = "Interval", ylab = "Average number of steps takenacross all days")
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4.png) 
 
-Below 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps
+Here is the 5-minute interval containing the maximum number of steps averaged across all the days in the dataset
+
 
 ```r
 agg2[agg2$avg_steps == max(agg2$avg_steps), ]
@@ -124,14 +130,8 @@ length(which(is.na(activity)))
 ```
 
 
+The strategy for imputing missing data is to replace with average number of steps for the interval across all days
 
-```r
-length(which(is.na(activity)))
-```
-
-```
-## [1] 2304
-```
 
 ```r
 activity2 <- activity
@@ -143,11 +143,12 @@ for (i in 1:nrow(activity2)) {
 }
 agg3 <- ddply(activity2, .(date), summarize, total_steps = sum(steps), mean_steps = round(mean(steps), 
     2), median_steps = median(steps))
+par(bg = "White")
 hist(agg3$total_steps, breaks = 10, xlab = "Total number of steps taken each day", 
     main = "Histogram of total number of steps taken each day")
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7.png) 
 
 ```r
 agg3[, c("date", "mean_steps", "median_steps")]
@@ -235,8 +236,8 @@ agg4 <- ddply(activity2, .(interval, day_flag), summarize, avg_steps = round(mea
 agg4 <- transform(agg4, day_flag = factor(day_flag))
 library(lattice)
 xyplot(avg_steps ~ interval | day_flag, type = "l", data = agg4, ylab = "Number of steps", 
-    layout = c(1, 2))
+    xlab = "Interval", layout = c(1, 2))
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7.png) 
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
 

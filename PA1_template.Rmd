@@ -12,7 +12,13 @@ activity[,2] <- as.Date(activity[,2], "%Y-%m-%d")
 ## What is mean total number of steps taken per day?
 ```{r fig.height=6, fig.width=7}
 agg1 <- ddply(activity, .(date), summarize, total_steps=sum(steps), mean_steps=round(mean(steps),2), median_steps=median(steps))
+par(bg = "white")
 hist(agg1$total_steps, breaks=10, xlab = "Total number of steps taken each day", main="Histogram of total number of steps taken each day")
+```
+
+Below shows the mean and median steps taken each day
+
+```{r}
 agg1[,c("date","mean_steps","median_steps")]
 ```
 
@@ -21,7 +27,8 @@ agg1[,c("date","mean_steps","median_steps")]
 agg2 <- ddply(activity, .(interval), summarize, avg_steps=round(mean(steps,na.rm=TRUE),2))
 plot(agg2$interval, agg2$avg_steps, type="l", xlab="Interval",ylab="Average number of steps takenacross all days")
 ```
-Below 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps
+Here is the 5-minute interval containing the maximum number of steps averaged across all the days in the dataset
+
 ```{r}
 agg2[agg2$avg_steps==max(agg2$avg_steps),]
 ```
@@ -31,15 +38,17 @@ The total number of missing values in the dataset:
 length(which(is.na(activity)))
 ```
 
+The strategy for imputing missing data is to replace with average number of steps for the interval across all days
+
 ```{r fig.height=6, fig.width=7}
-length(which(is.na(activity)))
 activity2 <- activity
 for (i in 1:nrow(activity2)) {
-  if (is.na(activity2[i,"steps"])) {
+    if (is.na(activity2[i,"steps"])) {
     activity2[i,"steps"] <- agg2[agg2$interval == activity2[i,"interval"], "avg_steps"]
   }
 }
 agg3 <- ddply(activity2, .(date), summarize, total_steps=sum(steps), mean_steps=round(mean(steps),2), median_steps=median(steps))
+par(bg = "White")
 hist(agg3$total_steps, breaks=10, xlab="Total number of steps taken each day", main="Histogram of total number of steps taken each day")
 agg3[,c("date","mean_steps","median_steps")]
 ```
@@ -51,5 +60,5 @@ activity2$day_flag <- sapply(activity2$date, function(x) {if ((weekdays(x)=="Sun
 agg4 <- ddply(activity2, .(interval,day_flag), summarize, avg_steps=round(mean(steps,na.rm=TRUE),2))
 agg4 <- transform(agg4, day_flag = factor(day_flag))
 library(lattice)
-xyplot(avg_steps ~ interval | day_flag, type="l", data=agg4,ylab="Number of steps", layout = c(1,2))
+xyplot(avg_steps ~ interval | day_flag, type="l", data=agg4,ylab="Number of steps", xlab="Interval", layout = c(1,2))
 ```
